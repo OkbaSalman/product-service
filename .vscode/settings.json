@@ -1,0 +1,8 @@
+{
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "java.project.sourcePaths": [
+    "src/main/java",
+    "target/generated-sources/protobuf/java",
+    "target/generated-sources/protobuf/grpc-java"
+  ]
+}
