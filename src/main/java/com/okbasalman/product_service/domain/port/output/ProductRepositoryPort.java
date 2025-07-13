@@ -8,8 +8,8 @@ import com.okbasalman.product_service.domain.model.Product;
 
 public interface ProductRepositoryPort {
     Product create(ProductCreateDto dto);
-    Product findById(Integer id);
+    Product findById(Long id);
     List<Product> findAll();
     Product update(Product product);
-    DeleteProductResultDto deleteById(Integer id);
+    DeleteProductResultDto deleteById(Long id);
 }

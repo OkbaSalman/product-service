@@ -24,7 +24,7 @@ public class JpaProductRepository implements ProductRepositoryPort{
     }
 
     @Override
-    public Product findById(Integer id) {
+    public Product findById(Long id) {
        ProductEntity entity =  repository.findById(id).orElseThrow(() -> new RuntimeException("Product not found with ID: " + id));
 
        return new Product(entity.getId(), entity.getName(), entity.getPrice(), entity.getStock());
@@ -48,7 +48,7 @@ public class JpaProductRepository implements ProductRepositoryPort{
     }
 
     @Override
-    public DeleteProductResultDto deleteById(Integer id){
+    public DeleteProductResultDto deleteById(Long id){
         if (!repository.existsById(id)) {
         return new DeleteProductResultDto(false, "Product not found.");
         }

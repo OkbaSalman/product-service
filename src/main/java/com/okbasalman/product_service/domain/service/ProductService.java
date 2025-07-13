@@ -18,7 +18,7 @@ public class ProductService implements ProductUseCase{
     
 
     @Override
-    public Product getProductById(Integer id) {
+    public Product getProductById(Long id) {
         return productRepositoryPort.findById(id);
     }
 
@@ -38,7 +38,7 @@ public class ProductService implements ProductUseCase{
     }
 
     @Override
-    public DeleteProductResultDto deleteProduct(Integer id){
+    public DeleteProductResultDto deleteProduct(Long id){
         return productRepositoryPort.deleteById(id);
     }
 }
