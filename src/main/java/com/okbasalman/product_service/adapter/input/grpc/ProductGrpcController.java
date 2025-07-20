@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.grpc.server.service.GrpcService;
 
 import com.okbasalman.grpc.CreateProductRequest;
+import com.okbasalman.grpc.DecreaseStockRequest;
 import com.okbasalman.grpc.DeleteProductRequest;
 import com.okbasalman.grpc.DeleteProductResponse;
 import com.okbasalman.grpc.Empty;
@@ -18,6 +19,9 @@ import com.okbasalman.product_service.domain.dto.DeleteProductResultDto;
 import com.okbasalman.product_service.domain.dto.ProductCreateDto;
 import com.okbasalman.product_service.domain.model.Product;
 import com.okbasalman.product_service.domain.port.input.ProductUseCase;
+
+import io.grpc.Status;
+
 
 import io.grpc.stub.StreamObserver;
 
@@ -83,5 +87,26 @@ public class ProductGrpcController extends ProductServiceImplBase{
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+     }
+
+     @Override
+     public void decreaseStock(DecreaseStockRequest request, StreamObserver<ProductResponse> responseObserver){
+        try {
+        Product product = productUseCase.decreaseStock(request.getProductId(), request.getQuantity());
+
+        ProductResponse response = ProductResponse.newBuilder()
+            .setId(product.getId())
+            .setName(product.getName())
+            .setPrice(product.getPrice())
+            .setStock(product.getStock())
+            .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    } catch (RuntimeException e) {
+        responseObserver.onError(Status.FAILED_PRECONDITION
+            .withDescription(e.getMessage())
+            .asRuntimeException());
+    }
      }
 }

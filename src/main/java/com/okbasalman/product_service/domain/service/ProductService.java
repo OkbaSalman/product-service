@@ -41,4 +41,9 @@ public class ProductService implements ProductUseCase{
     public DeleteProductResultDto deleteProduct(Long id){
         return productRepositoryPort.deleteById(id);
     }
+
+    @Override
+    public Product decreaseStock(Long id, int quantity){
+        return productRepositoryPort.decreaseStock(id, quantity);
+    }
 }

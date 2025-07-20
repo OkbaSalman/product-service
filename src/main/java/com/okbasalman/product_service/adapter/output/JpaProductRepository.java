@@ -67,5 +67,21 @@ public class JpaProductRepository implements ProductRepositoryPort{
         ProductEntity updatedEntity = repository.save(entity);
         return new Product(updatedEntity.getId(), updatedEntity.getName(), updatedEntity.getPrice(), updatedEntity.getStock());
     }
+
+    @Override
+    public Product decreaseStock(Long productId, int quantity) {
+        ProductEntity entity = repository.findById(productId)
+            .orElseThrow(() -> new RuntimeException("Product not found with ID: " + productId));
+
+        if (entity.getStock() < quantity) {
+          throw new RuntimeException("Insufficient stock for product ID: " + productId);
+     }
+
+        entity.setStock(entity.getStock() - quantity);
+     ProductEntity updated = repository.save(entity);
+
+        return new Product(updated.getId(), updated.getName(), updated.getPrice(), updated.getStock());
+    }
+
     
 }

@@ -12,4 +12,5 @@ public interface ProductRepositoryPort {
     List<Product> findAll();
     Product update(Product product);
     DeleteProductResultDto deleteById(Long id);
+    Product decreaseStock(Long id, int quantity);
 }
