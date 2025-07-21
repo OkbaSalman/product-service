@@ -20,93 +20,224 @@ import com.okbasalman.product_service.domain.dto.ProductCreateDto;
 import com.okbasalman.product_service.domain.model.Product;
 import com.okbasalman.product_service.domain.port.input.ProductUseCase;
 
+
 import io.grpc.Status;
-
-
 import io.grpc.stub.StreamObserver;
 
-
 @GrpcService
-public class ProductGrpcController extends ProductServiceImplBase{
+public class ProductGrpcController extends ProductServiceImplBase {
     private final ProductUseCase productUseCase;
 
-    public ProductGrpcController(ProductUseCase productUseCase){
+    
+
+    public ProductGrpcController(ProductUseCase productUseCase) {
         this.productUseCase = productUseCase;
     }
 
     @Override
-    public void getProductById(GetProductByIdRequest request, StreamObserver<ProductResponse> responObserver){
-        Product product = productUseCase.getProductById(request.getId());
-
-        ProductResponse response = ProductResponse.newBuilder().setId(product.getId()).setName(product.getName()).setPrice(product.getPrice()).setStock(product.getStock()).build();
-
-        responObserver.onNext(response);
-        responObserver.onCompleted();
-    }
-
-    @Override
-    public void getAllProducts(Empty request, StreamObserver<ProductListResponse> responseObserver){  
-     List<Product> products = productUseCase.getAllProducts();
-     
-     ProductListResponse response = ProductListResponse.newBuilder().addAllProducts(products.stream().map(p -> ProductResponse.newBuilder().setId(p.getId()).setName(p.getName()).setPrice(p.getPrice()).setStock(p.getStock()).build()).collect(Collectors.toList())).build();
-
-     responseObserver.onNext(response);
-     responseObserver.onCompleted();     
-        
-    }
-
-    @Override
-     public void createProduct(CreateProductRequest request, StreamObserver<ProductResponse> responseObserver){
-        ProductCreateDto productToBeCreated = new ProductCreateDto(request.getName(), request.getPrice(), request.getStock());
-
-        Product createdProduct = productUseCase.createProduct(productToBeCreated);
-
-        ProductResponse response =ProductResponse.newBuilder().setId(createdProduct.getId()).setName(createdProduct.getName()).setPrice(createdProduct.getPrice()).setStock(createdProduct.getStock()).build();
-
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
-     }
-
-     @Override
-     public void updateProduct(UpdateProductRequest request, StreamObserver<ProductResponse> responseObserver){
-        Product productToBeUpdated = new Product(request.getId(), request.getName(), request.getPrice(), request.getStock());
-
-        Product updatedProduct = productUseCase.updateProduct(productToBeUpdated);
-
-        ProductResponse response = ProductResponse.newBuilder().setId(updatedProduct.getId()).setName(updatedProduct.getName()).setPrice(updatedProduct.getPrice()).setStock(updatedProduct.getStock()).build();
-
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
-     }
-
-     @Override
-     public void deleteProduct(DeleteProductRequest request, StreamObserver<DeleteProductResponse> responseObserver){
-        DeleteProductResultDto deleteMessage = productUseCase.deleteProduct(request.getId());
-
-        DeleteProductResponse response = DeleteProductResponse.newBuilder().setSuccess(deleteMessage.isSuccess()).setMessage(deleteMessage.getMessage()).build();
-
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
-     }
-
-     @Override
-     public void decreaseStock(DecreaseStockRequest request, StreamObserver<ProductResponse> responseObserver){
+    public void getProductById(GetProductByIdRequest request, StreamObserver<ProductResponse> responseObserver) {
         try {
-        Product product = productUseCase.decreaseStock(request.getProductId(), request.getQuantity());
-
-        ProductResponse response = ProductResponse.newBuilder()
-            .setId(product.getId())
-            .setName(product.getName())
-            .setPrice(product.getPrice())
-            .setStock(product.getStock())
-            .build();
-
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
-    } catch (RuntimeException e) {
-        responseObserver.onError(Status.FAILED_PRECONDITION
-            .withDescription(e.getMessage())
-            .asRuntimeException());
+            Product product = productUseCase.getProductById(request.getId());
+            ProductResponse response = ProductResponse.newBuilder()
+                .setId(product.getId())
+                .setName(product.getName())
+                .setPrice(product.getPrice())
+                .setStock(product.getStock())
+                .addAllImagesUrls(List.of(product.getImagesUrls()))
+                .build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (IllegalArgumentException e) {
+            responseObserver.onError(
+                Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (RuntimeException e) {
+            responseObserver.onError(
+                Status.NOT_FOUND.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (Exception e) {
+            responseObserver.onError(
+                Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException()
+            );
+        }
     }
-     }
+
+    @Override
+    public void getAllProducts(Empty request, StreamObserver<ProductListResponse> responseObserver) {
+        try {
+            List<Product> products = productUseCase.getAllProducts();
+            ProductListResponse response = ProductListResponse.newBuilder()
+                .addAllProducts(products.stream()
+                    .map(p -> ProductResponse.newBuilder()
+                        .setId(p.getId())
+                        .setName(p.getName())
+                        .setPrice(p.getPrice())
+                        .setStock(p.getStock())
+                        .addAllImagesUrls(List.of(p.getImagesUrls()))
+                        .build())
+                    .collect(Collectors.toList()))
+                .build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(
+                Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException()
+            );
+        }
+    }
+
+    @Override
+    public void createProduct(CreateProductRequest request, StreamObserver<ProductResponse> responseObserver) {
+        try {
+            if (!request.hasName() || request.getName().trim().isEmpty()) {
+                throw new IllegalArgumentException("Product name is required.");
+            }
+            if (!request.hasPrice()) {
+                throw new IllegalArgumentException("Product price is required.");
+            }
+            if (request.getPrice() <= 0) {
+                throw new IllegalArgumentException("Product price must be greater than zero.");
+            }
+            if (!request.hasStock()) {
+                throw new IllegalArgumentException("Product stock is required.");
+            }
+            if (request.getStock() < 0) {
+                throw new IllegalArgumentException("Product stock cannot be negative.");
+            }
+            if (request.getImagesUrlsList() == null || request.getImagesUrlsList().isEmpty()) {
+                throw new IllegalArgumentException("At least one image URL is required.");
+            }
+            ProductCreateDto productToBeCreated = new ProductCreateDto(
+                request.getName(),
+                request.getPrice(),
+                request.getStock(),
+                request.getImagesUrlsList().toArray(new String[0])
+            );
+            Product createdProduct = productUseCase.createProduct(productToBeCreated);
+            ProductResponse response = ProductResponse.newBuilder()
+                .setId(createdProduct.getId())
+                .setName(createdProduct.getName())
+                .setPrice(createdProduct.getPrice())
+                .setStock(createdProduct.getStock())
+                .addAllImagesUrls(List.of(createdProduct.getImagesUrls()))
+                .build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (IllegalArgumentException e) {
+            responseObserver.onError(
+                Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (Exception e) {
+            responseObserver.onError(
+                Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException()
+            );
+        }
+    }
+
+    @Override
+    public void updateProduct(UpdateProductRequest request, StreamObserver<ProductResponse> responseObserver) {
+        try {
+            if (!request.hasId()) {
+                throw new IllegalArgumentException("Product ID is required for update.");
+            }
+            if (!request.hasName() || request.getName().trim().isEmpty()) {
+                throw new IllegalArgumentException("Product name is required.");
+            }
+            if (!request.hasPrice()) {
+                throw new IllegalArgumentException("Product price is required.");
+            }
+            if (request.getPrice() <= 0) {
+                throw new IllegalArgumentException("Product price must be greater than zero.");
+            }
+            if (!request.hasStock()) {
+                throw new IllegalArgumentException("Product stock is required.");
+            }
+            if (request.getStock() < 0) {
+                throw new IllegalArgumentException("Product stock cannot be negative.");
+            }
+            if (request.getImagesUrlsList() == null || request.getImagesUrlsList().isEmpty()) {
+                throw new IllegalArgumentException("At least one image URL is required.");
+            }
+            Product productToBeUpdated = new Product(
+                request.getId(),
+                request.getName(),
+                request.getPrice(),
+                request.getStock(),
+                request.getImagesUrlsList().toArray(new String[0])
+            );
+            Product updatedProduct = productUseCase.updateProduct(productToBeUpdated);
+            ProductResponse response = ProductResponse.newBuilder()
+                .setId(updatedProduct.getId())
+                .setName(updatedProduct.getName())
+                .setPrice(updatedProduct.getPrice())
+                .setStock(updatedProduct.getStock())
+                .addAllImagesUrls(List.of(updatedProduct.getImagesUrls()))
+                .build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (IllegalArgumentException e) {
+            responseObserver.onError(
+                Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (RuntimeException e) {
+            responseObserver.onError(
+                Status.NOT_FOUND.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (Exception e) {
+            responseObserver.onError(
+                Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException()
+            );
+        }
+    }
+
+    @Override
+    public void deleteProduct(DeleteProductRequest request, StreamObserver<DeleteProductResponse> responseObserver) {
+        try {
+            DeleteProductResultDto deleteMessage = productUseCase.deleteProduct(request.getId());
+            if (!deleteMessage.isSuccess()) {
+                responseObserver.onError(
+                    Status.NOT_FOUND.withDescription(deleteMessage.getMessage()).asRuntimeException()
+                );
+                return;
+            }
+            DeleteProductResponse response = DeleteProductResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage(deleteMessage.getMessage())
+                .build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(
+                Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException()
+            );
+        }
+    }
+
+    @Override
+    public void decreaseStock(DecreaseStockRequest request, StreamObserver<ProductResponse> responseObserver) {
+        try {
+            Product product = productUseCase.decreaseStock(request.getProductId(), request.getQuantity());
+            ProductResponse response = ProductResponse.newBuilder()
+                .setId(product.getId())
+                .setName(product.getName())
+                .setPrice(product.getPrice())
+                .setStock(product.getStock())
+                .addAllImagesUrls(List.of(product.getImagesUrls()))
+                .build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (IllegalArgumentException e) {
+            responseObserver.onError(
+                Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (RuntimeException e) {
+            responseObserver.onError(
+                Status.FAILED_PRECONDITION.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (Exception e) {
+            responseObserver.onError(
+                Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException()
+            );
+        }
+    }
 }

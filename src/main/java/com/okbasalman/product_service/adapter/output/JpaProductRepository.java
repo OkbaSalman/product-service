@@ -27,12 +27,12 @@ public class JpaProductRepository implements ProductRepositoryPort{
     public Product findById(Long id) {
        ProductEntity entity =  repository.findById(id).orElseThrow(() -> new RuntimeException("Product not found with ID: " + id));
 
-       return new Product(entity.getId(), entity.getName(), entity.getPrice(), entity.getStock());
+       return new Product(entity.getId(), entity.getName(), entity.getPrice(), entity.getStock(), entity.getImagesUrls());
     }
 
     @Override
     public List<Product> findAll() {
-        return repository.findAll().stream().map(e -> new Product(e.getId(), e.getName(), e.getPrice(), e.getStock())).collect(Collectors.toList());
+        return repository.findAll().stream().map(e -> new Product(e.getId(), e.getName(), e.getPrice(), e.getStock(), e.getImagesUrls())).collect(Collectors.toList());
     }
 
     @Override
@@ -41,10 +41,11 @@ public class JpaProductRepository implements ProductRepositoryPort{
         entity.setName(dto.getName());
         entity.setPrice(dto.getPrice());
         entity.setStock(dto.getStock());
+        entity.setImagesUrls(dto.getImagesUrls());
 
         ProductEntity savedEntity = repository.save(entity);
 
-        return new Product(savedEntity.getId(), savedEntity.getName(), savedEntity.getPrice(), savedEntity.getStock());
+        return new Product(savedEntity.getId(), savedEntity.getName(), savedEntity.getPrice(), savedEntity.getStock(), savedEntity.getImagesUrls());
     }
 
     @Override
@@ -63,9 +64,10 @@ public class JpaProductRepository implements ProductRepositoryPort{
         entity.setName(product.getName());
         entity.setPrice(product.getPrice());
         entity.setStock(product.getStock());
+        entity.setImagesUrls(product.getImagesUrls());
 
         ProductEntity updatedEntity = repository.save(entity);
-        return new Product(updatedEntity.getId(), updatedEntity.getName(), updatedEntity.getPrice(), updatedEntity.getStock());
+        return new Product(updatedEntity.getId(), updatedEntity.getName(), updatedEntity.getPrice(), updatedEntity.getStock(), updatedEntity.getImagesUrls());
     }
 
     @Override
@@ -80,7 +82,7 @@ public class JpaProductRepository implements ProductRepositoryPort{
         entity.setStock(entity.getStock() - quantity);
      ProductEntity updated = repository.save(entity);
 
-        return new Product(updated.getId(), updated.getName(), updated.getPrice(), updated.getStock());
+        return new Product(updated.getId(), updated.getName(), updated.getPrice(), updated.getStock(), updated.getImagesUrls());
     }
 
     

@@ -21,10 +21,12 @@ message DecreaseStockRequest {
 }
 
 message CreateProductRequest {
-    string name = 1;
-    double price = 2;
-    int32 stock = 3;
+    optional string name = 1;
+    optional double price = 2;
+    optional int32 stock = 3;
+    repeated string imagesUrls = 4;
 }
+
 
 
 message GetProductByIdRequest {
@@ -33,10 +35,11 @@ message GetProductByIdRequest {
 
 
 message UpdateProductRequest {
-    int64 id = 1;
-    string name = 2;
-    double price = 3;
-    int32 stock = 4;
+    optional int64 id = 1;
+    optional string name = 2;
+    optional double price = 3;
+    optional int32 stock = 4;
+    repeated string imagesUrls = 5;
 }
 
 
@@ -51,6 +54,7 @@ message ProductResponse {
     string name = 2;
     double price = 3;
     int32 stock = 4;
+    repeated string imagesUrls = 5;
 }
 
 message ProductListResponse {
