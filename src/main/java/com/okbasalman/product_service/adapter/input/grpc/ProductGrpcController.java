@@ -18,6 +18,8 @@ import com.okbasalman.grpc.ProductServiceGrpc.ProductServiceImplBase;
 import com.okbasalman.product_service.domain.dto.DeleteProductResultDto;
 import com.okbasalman.product_service.domain.dto.ProductCreateDto;
 import com.okbasalman.product_service.domain.model.Product;
+import com.okbasalman.product_service.domain.model.Season;
+import com.okbasalman.product_service.domain.model.Size;
 import com.okbasalman.product_service.domain.port.input.ProductUseCase;
 
 
@@ -38,12 +40,16 @@ public class ProductGrpcController extends ProductServiceImplBase {
     public void getProductById(GetProductByIdRequest request, StreamObserver<ProductResponse> responseObserver) {
         try {
             Product product = productUseCase.getProductById(request.getId());
+            
             ProductResponse response = ProductResponse.newBuilder()
                 .setId(product.getId())
                 .setName(product.getName())
                 .setPrice(product.getPrice())
                 .setStock(product.getStock())
                 .addAllImagesUrls(List.of(product.getImagesUrls()))
+                .setColor(product.getColor())
+                .setSize(product.getSize().name())
+                .setSeason(product.getSeason().name())
                 .build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
@@ -74,6 +80,9 @@ public class ProductGrpcController extends ProductServiceImplBase {
                         .setPrice(p.getPrice())
                         .setStock(p.getStock())
                         .addAllImagesUrls(List.of(p.getImagesUrls()))
+                        .setColor(p.getColor())
+                        .setSize(p.getSize().name())
+                        .setSeason(p.getSeason().name())
                         .build())
                     .collect(Collectors.toList()))
                 .build();
@@ -107,11 +116,23 @@ public class ProductGrpcController extends ProductServiceImplBase {
             if (request.getImagesUrlsList() == null || request.getImagesUrlsList().isEmpty()) {
                 throw new IllegalArgumentException("At least one image URL is required.");
             }
+            if (!request.hasColor()) {
+                throw new IllegalArgumentException("Product color is required.");
+            }
+            if (!request.hasSize()) {
+                throw new IllegalArgumentException("Product size is required.");
+            }
+            if (!request.hasSeason()) {
+                throw new IllegalArgumentException("Product season is required.");
+            }
             ProductCreateDto productToBeCreated = new ProductCreateDto(
                 request.getName(),
                 request.getPrice(),
                 request.getStock(),
-                request.getImagesUrlsList().toArray(new String[0])
+                request.getImagesUrlsList().toArray(new String[0]),
+                request.getColor(),
+                Size.valueOf(request.getSize()),
+                Season.valueOf(request.getSeason())
             );
             Product createdProduct = productUseCase.createProduct(productToBeCreated);
             ProductResponse response = ProductResponse.newBuilder()
@@ -120,6 +141,9 @@ public class ProductGrpcController extends ProductServiceImplBase {
                 .setPrice(createdProduct.getPrice())
                 .setStock(createdProduct.getStock())
                 .addAllImagesUrls(List.of(createdProduct.getImagesUrls()))
+                .setColor(createdProduct.getColor())
+                .setSize(createdProduct.getSize().name())
+                .setSeason(createdProduct.getSeason().name())
                 .build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
@@ -158,12 +182,24 @@ public class ProductGrpcController extends ProductServiceImplBase {
             if (request.getImagesUrlsList() == null || request.getImagesUrlsList().isEmpty()) {
                 throw new IllegalArgumentException("At least one image URL is required.");
             }
+            if (!request.hasColor()) {
+                throw new IllegalArgumentException("Product color is required.");
+            }
+            if (!request.hasSize()) {
+                throw new IllegalArgumentException("Product size is required.");
+            }
+            if (!request.hasSeason()) {
+                throw new IllegalArgumentException("Product season is required.");
+            }  
             Product productToBeUpdated = new Product(
                 request.getId(),
                 request.getName(),
                 request.getPrice(),
                 request.getStock(),
-                request.getImagesUrlsList().toArray(new String[0])
+                request.getImagesUrlsList().toArray(new String[0]),
+                request.getColor(),
+                Size.valueOf(request.getSize()),
+                Season.valueOf(request.getSeason())
             );
             Product updatedProduct = productUseCase.updateProduct(productToBeUpdated);
             ProductResponse response = ProductResponse.newBuilder()
@@ -172,6 +208,9 @@ public class ProductGrpcController extends ProductServiceImplBase {
                 .setPrice(updatedProduct.getPrice())
                 .setStock(updatedProduct.getStock())
                 .addAllImagesUrls(List.of(updatedProduct.getImagesUrls()))
+                .setColor(updatedProduct.getColor())
+                .setSize(updatedProduct.getSize().name())
+                .setSeason(updatedProduct.getSeason().name())
                 .build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
@@ -223,6 +262,9 @@ public class ProductGrpcController extends ProductServiceImplBase {
                 .setPrice(product.getPrice())
                 .setStock(product.getStock())
                 .addAllImagesUrls(List.of(product.getImagesUrls()))
+                .setColor(product.getColor())
+                .setSize(product.getSize().name())
+                .setSeason(product.getSeason().name())
                 .build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();

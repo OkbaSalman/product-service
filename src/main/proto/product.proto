@@ -5,6 +5,9 @@ option java_package="com.okbasalman.grpc";
 option java_outer_classname="ProductsProto";
 
 
+
+
+
 service ProductService {
     rpc CreateProduct (CreateProductRequest) returns (ProductResponse);
     rpc GetProductById (GetProductByIdRequest) returns (ProductResponse);
@@ -14,6 +17,7 @@ service ProductService {
 
     rpc DecreaseStock (DecreaseStockRequest) returns (ProductResponse);
 }
+
 
 message DecreaseStockRequest {
   int64 product_id = 1;
@@ -25,6 +29,9 @@ message CreateProductRequest {
     optional double price = 2;
     optional int32 stock = 3;
     repeated string imagesUrls = 4;
+    optional string color = 5;
+    optional string size = 6;
+    optional string season = 7;
 }
 
 
@@ -40,6 +47,9 @@ message UpdateProductRequest {
     optional double price = 3;
     optional int32 stock = 4;
     repeated string imagesUrls = 5;
+    optional string color = 6;
+    optional string size = 7;
+    optional string season = 8;
 }
 
 
@@ -55,6 +65,10 @@ message ProductResponse {
     double price = 3;
     int32 stock = 4;
     repeated string imagesUrls = 5;
+    string color = 6;
+    string size = 7;
+    string season = 8;
+    
 }
 
 message ProductListResponse {

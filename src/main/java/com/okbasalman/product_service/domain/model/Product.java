@@ -1,5 +1,7 @@
 package com.okbasalman.product_service.domain.model;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -11,4 +13,9 @@ public class Product {
     private double price;
     private int stock;
     private String[] imagesUrls;
+    private String color;
+    private Size size;
+    private Season season;
+    
+
 }
