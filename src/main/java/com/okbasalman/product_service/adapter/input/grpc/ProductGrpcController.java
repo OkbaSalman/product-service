@@ -50,6 +50,7 @@ public class ProductGrpcController extends ProductServiceImplBase {
                 .setColor(product.getColor())
                 .setSize(product.getSize().name())
                 .setSeason(product.getSeason().name())
+                .setDescription(product.getDescription())
                 .build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
@@ -83,6 +84,7 @@ public class ProductGrpcController extends ProductServiceImplBase {
                         .setColor(p.getColor())
                         .setSize(p.getSize().name())
                         .setSeason(p.getSeason().name())
+                        .setDescription(p.getDescription())
                         .build())
                     .collect(Collectors.toList()))
                 .build();
@@ -132,7 +134,8 @@ public class ProductGrpcController extends ProductServiceImplBase {
                 request.getImagesUrlsList().toArray(new String[0]),
                 request.getColor(),
                 Size.valueOf(request.getSize()),
-                Season.valueOf(request.getSeason())
+                Season.valueOf(request.getSeason()),
+                request.getDescription()
             );
             Product createdProduct = productUseCase.createProduct(productToBeCreated);
             ProductResponse response = ProductResponse.newBuilder()
@@ -144,6 +147,7 @@ public class ProductGrpcController extends ProductServiceImplBase {
                 .setColor(createdProduct.getColor())
                 .setSize(createdProduct.getSize().name())
                 .setSeason(createdProduct.getSeason().name())
+                .setDescription(createdProduct.getDescription())
                 .build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
@@ -199,7 +203,8 @@ public class ProductGrpcController extends ProductServiceImplBase {
                 request.getImagesUrlsList().toArray(new String[0]),
                 request.getColor(),
                 Size.valueOf(request.getSize()),
-                Season.valueOf(request.getSeason())
+                Season.valueOf(request.getSeason()),
+                request.getDesription()
             );
             Product updatedProduct = productUseCase.updateProduct(productToBeUpdated);
             ProductResponse response = ProductResponse.newBuilder()
@@ -211,6 +216,7 @@ public class ProductGrpcController extends ProductServiceImplBase {
                 .setColor(updatedProduct.getColor())
                 .setSize(updatedProduct.getSize().name())
                 .setSeason(updatedProduct.getSeason().name())
+                .setDescription(updatedProduct.getDescription())
                 .build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
@@ -265,6 +271,7 @@ public class ProductGrpcController extends ProductServiceImplBase {
                 .setColor(product.getColor())
                 .setSize(product.getSize().name())
                 .setSeason(product.getSeason().name())
+                .setDescription(product.getDescription())
                 .build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();

@@ -28,12 +28,12 @@ public class JpaProductRepository implements ProductRepositoryPort{
     public Product findById(Long id) {
        ProductEntity entity =  repository.findById(id).orElseThrow(() -> new RuntimeException("Product not found with ID: " + id));
 
-       return new Product(entity.getId(), entity.getName(), entity.getPrice(), entity.getStock(), entity.getImagesUrls(), entity.getColor(), entity.getSize(), entity.getSeason());
+       return new Product(entity.getId(), entity.getName(), entity.getPrice(), entity.getStock(), entity.getImagesUrls(), entity.getColor(), entity.getSize(), entity.getSeason(), entity.getDescription());
     }
 
     @Override
     public List<Product> findAll() {
-        return repository.findAll().stream().map(e -> new Product(e.getId(), e.getName(), e.getPrice(), e.getStock(), e.getImagesUrls(), e.getColor(), e.getSize(), e.getSeason())).collect(Collectors.toList());
+        return repository.findAll().stream().map(e -> new Product(e.getId(), e.getName(), e.getPrice(), e.getStock(), e.getImagesUrls(), e.getColor(), e.getSize(), e.getSeason(), e.getDescription())).collect(Collectors.toList());
     }
 
     @Override
@@ -46,10 +46,11 @@ public class JpaProductRepository implements ProductRepositoryPort{
         entity.setColor(dto.getColor());
         entity.setSize(dto.getSize());
         entity.setSeason(dto.getSeason());
+        entity.setDescription(dto.getDescription());
 
         ProductEntity savedEntity = repository.save(entity);
 
-        return new Product(savedEntity.getId(), savedEntity.getName(), savedEntity.getPrice(), savedEntity.getStock(), savedEntity.getImagesUrls(), savedEntity.getColor(), savedEntity.getSize(), savedEntity.getSeason());
+        return new Product(savedEntity.getId(), savedEntity.getName(), savedEntity.getPrice(), savedEntity.getStock(), savedEntity.getImagesUrls(), savedEntity.getColor(), savedEntity.getSize(), savedEntity.getSeason(), savedEntity.getDescription());
     }
 
     @Override
@@ -72,9 +73,10 @@ public class JpaProductRepository implements ProductRepositoryPort{
         entity.setColor(product.getColor());
         entity.setSize(product.getSize());
         entity.setSeason(product.getSeason());
+        entity.setDescription(product.getDescription());
 
         ProductEntity updatedEntity = repository.save(entity);
-        return new Product(updatedEntity.getId(), updatedEntity.getName(), updatedEntity.getPrice(), updatedEntity.getStock(), updatedEntity.getImagesUrls(), updatedEntity.getColor(), updatedEntity.getSize(), updatedEntity.getSeason());
+        return new Product(updatedEntity.getId(), updatedEntity.getName(), updatedEntity.getPrice(), updatedEntity.getStock(), updatedEntity.getImagesUrls(), updatedEntity.getColor(), updatedEntity.getSize(), updatedEntity.getSeason(), updatedEntity.getDescription());
     }
 
     @Override
@@ -89,7 +91,7 @@ public class JpaProductRepository implements ProductRepositoryPort{
         entity.setStock(entity.getStock() - quantity);
      ProductEntity updated = repository.save(entity);
 
-        return new Product(updated.getId(), updated.getName(), updated.getPrice(), updated.getStock(), updated.getImagesUrls(), updated.getColor(), updated.getSize(), updated.getSeason());
+        return new Product(updated.getId(), updated.getName(), updated.getPrice(), updated.getStock(), updated.getImagesUrls(), updated.getColor(), updated.getSize(), updated.getSeason(), updated.getDescription());
     }
 
     

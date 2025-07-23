@@ -16,4 +16,5 @@ public class ProductCreateDto {
     private String color;
     private Size size;
     private Season season;
+    private String description;
 }

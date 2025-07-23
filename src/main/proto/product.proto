@@ -32,6 +32,7 @@ message CreateProductRequest {
     optional string color = 5;
     optional string size = 6;
     optional string season = 7;
+    optional string description = 8;
 }
 
 
@@ -50,6 +51,7 @@ message UpdateProductRequest {
     optional string color = 6;
     optional string size = 7;
     optional string season = 8;
+    optional string desription = 9;
 }
 
 
@@ -68,6 +70,7 @@ message ProductResponse {
     string color = 6;
     string size = 7;
     string season = 8;
+    string description = 9;
     
 }
 
