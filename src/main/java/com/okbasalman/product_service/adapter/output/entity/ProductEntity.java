@@ -1,6 +1,6 @@
 package com.okbasalman.product_service.adapter.output.entity;
 
-import java.time.LocalDateTime;
+
 
 import com.okbasalman.product_service.domain.model.Season;
 import com.okbasalman.product_service.domain.model.Size;
