@@ -12,5 +12,5 @@ public interface ProductUseCase {
     Product getProductById(Long id);
     Product updateProduct(Product product);
     DeleteProductResultDto deleteProduct(Long id);
-    Product decreaseStock(Long productId, int quantity);
+    Product decreaseStock(Long productVariantId, int quantity);
 }
