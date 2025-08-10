@@ -16,7 +16,7 @@ service ProductService {
     rpc DecreaseStock (DecreaseStockRequest) returns (ProductResponse);
 }
 
-// Nested messages
+
 message ProductImageResponse {
     int64 id = 1;
     string base64Data = 2;

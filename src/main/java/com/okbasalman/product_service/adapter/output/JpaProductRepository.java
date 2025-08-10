@@ -63,13 +63,12 @@ public class JpaProductRepository implements ProductRepositoryPort {
         ProductEntity entity = productRepository.findById(product.getId())
                 .orElseThrow(() -> new RuntimeException("Product not found with ID: " + product.getId()));
 
-        // Update core product fields
+        
         entity.setName(product.getName());
         entity.setDescription(product.getDescription());
         entity.setSeason(product.getSeason());
 
-        // We will assume a simple update strategy: replace all variants.
-        // This is a powerful feature of using cascade.
+        
         entity.getVariants().clear();
         entity.getVariants().addAll(mapProductVariantsToEntities(product.getVariants(), entity));
 

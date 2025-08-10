@@ -16,5 +16,5 @@ public class Product {
     private String name;
     private String description;
     private Season season;
-    private List<ProductVariant> variants; // A product now holds a list of its variants
+    private List<ProductVariant> variants; 
 }

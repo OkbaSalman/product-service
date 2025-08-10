@@ -68,20 +68,20 @@ public class ProductGrpcController extends ProductServiceImplBase {
     @Override
     public void createProduct(CreateProductRequest request, StreamObserver<ProductResponse> responseObserver) {
         try {
-            // Validation
+            
             if (request.getName().trim().isEmpty()) {
                 throw new IllegalArgumentException("Product name is required.");
             }
             if (request.getVariantsList() == null || request.getVariantsList().isEmpty()) {
                 throw new IllegalArgumentException("At least one product variant is required.");
             }
-            // Map gRPC request to domain DTO
+            
             ProductCreateDto dto = mapToProductCreateDto(request);
 
-            // Call domain use case
+            
             Product createdProduct = productUseCase.createProduct(dto);
 
-            // Map domain model to gRPC response
+            
             ProductResponse response = mapToProductResponse(createdProduct);
             responseObserver.onNext(response);
             responseObserver.onCompleted();
@@ -95,7 +95,7 @@ public class ProductGrpcController extends ProductServiceImplBase {
     @Override
     public void updateProduct(UpdateProductRequest request, StreamObserver<ProductResponse> responseObserver) {
         try {
-            // Validation
+
             if (request.getId() == 0) {
                 throw new IllegalArgumentException("Product ID is required for update.");
             }
@@ -106,10 +106,10 @@ public class ProductGrpcController extends ProductServiceImplBase {
                 throw new IllegalArgumentException("At least one product variant is required.");
             }
 
-            // Map gRPC request to domain model
+            
             Product productToBeUpdated = mapToProduct(request);
 
-            // Call domain use case
+            
             Product updatedProduct = productUseCase.updateProduct(productToBeUpdated);
 
             ProductResponse response = mapToProductResponse(updatedProduct);
